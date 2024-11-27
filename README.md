@@ -90,26 +90,15 @@ This is a simple Event Management Service built using FastAPI. The service allow
 
     SELECT * FROM Events;
 
-## Database Schema
-
-Table: Events
-
-Column	Type	Constraints
-id	INT	Primary Key, Auto Increment
-organizationId	INT	Not Null
-name	VARCHAR(255)	Not Null
-description	TEXT	
-date	DATE	Not Null
-time	TIME	Not Null
-location	VARCHAR(255)	
-category	VARCHAR(100)	
-rsvpCount	INT	Default: 0
 
 ## Expected Output:
 
-id	organizationId	name	description	date	time	location	category	rsvpCount
-1	1	Hackathon 2024	A technology hackathon event	2024-12-15	10:00:00	Campus Hall	Technology	0
-2	2	Workshop	A hands-on machine learning workshop	2024-12-20	14:00:00	Room 101	Education	5
++----+----------------+--------------------+-------------------------------+------------+----------+-------------+-------------+-----------+
+| id | organizationId | name               | description                   | date       | time     | location    | category    | rsvpCount |
++----+----------------+--------------------+-------------------------------+------------+----------+-------------+-------------+-----------+
+|  1 |              1 | Hackathon 2024     | A technology hackathon event  | 2024-12-15 | 10:00:00 | Campus Hall | Technology  |         0 |
+|  2 |              2 | Updated Hackathon  | Updated description           | 2024-12-20 | 12:00:00 | Updated Hall| Tech Update |         5 |
++----+----------------+--------------------+-------------------------------+------------+----------+-------------+-------------+-----------+
 
 6. Exit MySQL:
 
