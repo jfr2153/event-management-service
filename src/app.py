@@ -4,6 +4,10 @@ from src.crud import create_event, get_all_events, get_event_by_id, update_event
 
 app = FastAPI()
 
+@app.get("/")
+def root():
+    return {"message": "Welcome to the Event Management API"}
+
 @app.post("/events")
 def create_event_endpoint(event: Event):
     return create_event(event)
