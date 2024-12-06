@@ -54,11 +54,11 @@ This is a simple Event Management Service built using FastAPI. The service allow
 
 2. Run the FastAPI application using Uvicorn:
 
-    uvicorn src.app:app --host 0.0.0.0 --port 8000
+    uvicorn src.app:app --host 0.0.0.0 --port 8001
 
-3. Open your browser and go to http://127.0.0.1:8000 to see the application running.
+3. Open your browser and go to http://127.0.0.1:8001 to see the application running.
 
-4. Access the interactive API documentation at http://127.0.0.1:8000/docs.
+4. Access the interactive API documentation at http://127.0.0.1:8001/docs.
 
 
 ## API Endpoints
@@ -133,7 +133,7 @@ Expected Response:
 
 5. Run the Application:
 
-    uvicorn src.app:app --host 0.0.0.0 --port 8000
+    uvicorn src.app:app --host 0.0.0.0 --port 8001
 
 6. Access the application:
 
