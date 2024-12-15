@@ -1,68 +1,56 @@
-from src.database import db_connection
+from sqlalchemy.orm import Session
+from src.models import Event
+from src.schemas import EventCreate, EventUpdate
 
-# Create Event
-def create_event(event):
-    cursor = db_connection.cursor()
-    query = """
-    INSERT INTO Events (organizationId, name, description, date, time, location, category, rsvpCount)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    values = (
-        event.organizationId,
-        event.name,
-        event.description,
-        event.date,
-        event.time,
-        event.location,
-        event.category,
-        event.rsvpCount,
-    )
-    cursor.execute(query, values)
-    db_connection.commit()
-    return {"id": cursor.lastrowid, **event.dict()}
+def add_hateoas_to_event(event: dict):
+    return {
+        **event,
+        "_links": {
+            "self": f"/events/{event['id']}",
+            "update": f"/events/{event['id']}",
+            "delete": f"/events/{event['id']}",
+            "organization": f"/organizations/{event['organizationId']}"
+        }
+    }
 
-# Get All Events
-def get_all_events():
-    cursor = db_connection.cursor(dictionary=True)
-    query = "SELECT * FROM Events"
-    cursor.execute(query)
-    return cursor.fetchall()
+def sqlalchemy_to_dict(obj):
+    return {c.key: getattr(obj, c.key) for c in obj.__table__.columns}
 
-# Get Event by ID
-def get_event_by_id(event_id):
-    cursor = db_connection.cursor(dictionary=True)
-    query = "SELECT * FROM Events WHERE id = %s"
-    cursor.execute(query, (event_id,))
-    return cursor.fetchone()
+def create_event(db: Session, event: EventCreate):
+    db_event = Event(**event.dict())
+    db.add(db_event)
+    db.commit()
+    db.refresh(db_event)  # auto-generated ID
+    return add_hateoas_to_event(sqlalchemy_to_dict(db_event)) #HATEOAS links
 
-# Update Event
-def update_event(event_id, event):
-    cursor = db_connection.cursor()
-    query = """
-    UPDATE Events
-    SET organizationId = %s, name = %s, description = %s, date = %s, time = %s, location = %s, category = %s, rsvpCount = %s
-    WHERE id = %s
-    """
-    values = (
-        event.organizationId,
-        event.name,
-        event.description,
-        event.date,
-        event.time,
-        event.location,
-        event.category,
-        event.rsvpCount,
-        event_id,
-    )
-    cursor.execute(query, values)
-    db_connection.commit()
-    return {"id": event_id, **event.dict()}
+def get_all_events(db: Session):
+    events = db.query(Event).all()
+    return [add_hateoas_to_event(sqlalchemy_to_dict(event)) for event in events] #HATEOAS links
 
-# Delete Event
-def delete_event(event_id):
-    cursor = db_connection.cursor()
-    query = "DELETE FROM Events WHERE id = %s"
-    cursor.execute(query, (event_id,))
-    db_connection.commit()
-    return {"message": "Event deleted successfully"}
+def get_event_by_id(db: Session, event_id: int):
+    event = db.query(Event).filter(Event.id == event_id).first()
+    return add_hateoas_to_event(sqlalchemy_to_dict(event)) if event else None #HATEOAS links
 
+def update_event(db: Session, event_id: int, event_update: EventUpdate):
+    db_event = db.query(Event).filter(Event.id == event_id).first()
+    if db_event:
+        for key, value in event_update.dict(exclude_unset=True).items():
+            setattr(db_event, key, value)
+        db.commit()
+        db.refresh(db_event)
+        return add_hateoas_to_event(sqlalchemy_to_dict(db_event)) #HATEOAS links
+    return None
+
+def delete_event(db: Session, event_id: int):
+    db_event = db.query(Event).filter(Event.id == event_id).first()
+    if db_event:
+        db.delete(db_event)
+        db.commit()
+        return {
+            "message": "Event deleted successfully",
+            "_links": {
+                "create": "/events", #HATEOAS link to create event
+                "all": "/events" #HATEOAS link to read all events
+            }
+        }
+    return None

@@ -1,27 +1,24 @@
-import mysql.connector
-from mysql.connector import Error
+# src/database.py
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base  # Import declarative_base
 from dotenv import load_dotenv
 import os
 
+# Load environment variables
 load_dotenv()
 
-def create_connection():
-    try:
-        # Use environment variables to get the connection details
-        connection = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME"),
-            port=int(os.getenv("DB_PORT"))  # Ensure port is an integer
-        )
-        
-        print("Connected to the database!")
-        return connection
-    
-    except Error as e:
-        print(f"Error: {e}")
-        return None
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "dbuserdbuser")
+DB_HOST = os.getenv("DB_HOST", "event-management-service.cyswkjclynii.us-east-1.rds.amazonaws.com")
+DB_PORT = os.getenv("DB_PORT", "3306")
+DB_NAME = os.getenv("DB_NAME", "events_db")
 
+DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-db_connection = create_connection()
+# SQLAlchemy setup
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base class for SQLAlchemy models
+Base = declarative_base()  # Fixed import
