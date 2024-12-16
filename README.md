@@ -139,6 +139,7 @@ Expected Response:
 
     http://<EC2_PUBLIC_IP>:8000
     
+---
 
 # Event Management API Documentation
 
