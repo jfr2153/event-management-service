@@ -140,3 +140,235 @@ Expected Response:
     http://<EC2_PUBLIC_IP>:8000
     
 
+# Event Management API Documentation
+
+## Base URL
+
+- **Local Development**: `http://127.0.0.1:8000`
+
+---
+
+## Middleware
+
+### Logging Middleware
+
+- **Purpose**: Logs all incoming requests and outgoing responses, along with metadata such as request headers, response status codes, and execution time.
+- **Details**:
+  - Generates a unique request ID for each request to trace logs.
+  - Logs request headers and body for debugging.
+  - Measures processing time for performance monitoring.
+
+---
+
+## Endpoints
+
+### 1. GET `/`
+
+- **Description**: Returns a welcome message.
+- **Response**:
+  - **Status Code**: `200 OK`
+  - **Body**:
+    ```json
+    {
+      "message": "Welcome to the Event Management API"
+    }
+    ```
+
+---
+
+### 2. POST `/events`
+
+- **Description**: Creates a new event.
+- **Request Body** (JSON):
+  ```json
+  {
+    "organizationId": 1,
+    "name": "Event Name",
+    "description": "Description of the event",
+    "date": "YYYY-MM-DD",
+    "time": "HH:MM",
+    "location": "Event location",
+    "category": "Event category",
+    "rsvpCount": 0
+  }
+  ```
+- **Response**:
+  - **Status Code**: `201 Created`
+  - **Body**: The created event object.
+    ```json
+    {
+      "id": 3,
+      "organizationId": 1,
+      "name": "Event Name",
+      "description": "Description of the event",
+      "date": "YYYY-MM-DD",
+      "time": "HH:MM",
+      "location": "Event location",
+      "category": "Event category",
+      "rsvpCount": 0
+    }
+    ```
+
+---
+
+### 3. GET `/events`
+
+- **Description**: Retrieves a list of events with optional filtering by date.
+- **Query Parameters**:
+  - `date` (string, optional): Filter by event date in `YYYY-MM-DD` format. If not specified, retrieves events from all dates.
+  - `page` (integer, default: 1): The current page.
+  - `limit` (integer, default: 10): Number of items per page.
+- **Response**:
+  - **Status Code**: `200 OK`
+  - **Body**:
+    ```json
+    {
+      "page": 1,
+      "limit": 10,
+      "total": 50,
+      "events": [
+        {
+          "id": 3,
+          "organizationId": 1,
+          "name": "Event Name",
+          "description": "Description of the event",
+          "date": "YYYY-MM-DD",
+          "time": "HH:MM",
+          "location": "Event location",
+          "category": "Event category",
+          "rsvpCount": 0
+        },
+        ...
+      ]
+    }
+    ```
+
+---
+
+### 4. GET `/events/{id}`
+
+- **Description**: Retrieves an event by its ID.
+- **Path Parameters**:
+  - `id` (integer): The ID of the event.
+- **Response**:
+  - **Status Code**: `200 OK` if found.
+  - **Status Code**: `404 Not Found` if the event does not exist.
+  - **Body**:
+    **Example (Found):**
+    ```json
+    {
+      "id": 3,
+      "organizationId": 1,
+      "name": "Event Name",
+      "description": "Description of the event",
+      "date": "YYYY-MM-DD",
+      "time": "HH:MM",
+      "location": "Event location",
+      "category": "Event category",
+      "rsvpCount": 0
+    }
+    ```
+    **Example (Not Found):**
+    ```json
+    {
+      "detail": "Event not found"
+    }
+    ```
+
+---
+
+### 5. PUT `/events/{id}`
+
+- **Description**: Updates an existing event.
+- **Path Parameters**:
+  - `id` (integer): The ID of the event to update.
+- **Request Body** (JSON):
+  ```json
+  {
+    "organizationId": 1,
+    "name": "Updated Event Name",
+    "description": "Updated description",
+    "date": "YYYY-MM-DD",
+    "time": "HH:MM",
+    "location": "Updated location",
+    "category": "Updated category",
+    "rsvpCount": 10
+  }
+  ```
+- **Response**:
+  - **Status Code**: `200 OK` if updated.
+  - **Status Code**: `404 Not Found` if the event does not exist.
+  - **Body**:
+    **Example (Updated):**
+    ```json
+    {
+      "id": 3,
+      "organizationId": 1,
+      "name": "Updated Event Name",
+      "description": "Updated description",
+      "date": "YYYY-MM-DD",
+      "time": "HH:MM",
+      "location": "Updated location",
+      "category": "Updated category",
+      "rsvpCount": 10
+    }
+    ```
+    **Example (Not Found):**
+    ```json
+    {
+      "detail": "Event not found"
+    }
+    ```
+
+---
+
+### 6. DELETE `/events/{id}`
+
+- **Description**: Deletes an event.
+- **Path Parameters**:
+  - `id` (integer): The ID of the event to delete.
+- **Response**:
+  - **Status Code**: `200 OK` if deleted.
+  - **Status Code**: `404 Not Found` if the event does not exist.
+  - **Body**:
+    **Example (Deleted):**
+    ```json
+    {
+      "message": "Event deleted successfully"
+    }
+    ```
+    **Example (Not Found):**
+    ```json
+    {
+      "detail": "Event not found"
+    }
+    ```
+
+---
+
+## Models
+
+### Event
+
+- **Fields**:
+  - `id` (integer): The unique identifier of the event.
+  - `organizationId` (integer): The ID of the organization hosting the event.
+  - `name` (string): The name of the event.
+  - `description` (string, optional): A description of the event.
+  - `date` (string): The date of the event (YYYY-MM-DD).
+  - `time` (string): The time of the event.
+  - `location` (string): The location of the event.
+  - `category` (string): The category of the event.
+  - `rsvpCount` (integer): The number of RSVPs.
+
+---
+
+## Error Responses
+
+- **400 Bad Request**: Invalid input or parameters.
+- **404 Not Found**: The requested resource could not be found.
+- **500 Internal Server Error**: A server error occurred.
+
+---
+
+
