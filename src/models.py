@@ -1,3 +1,4 @@
+#src/model.py
 from pydantic import BaseModel
 
 class Event(BaseModel):
